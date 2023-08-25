@@ -93,7 +93,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">16 min</span>
+            <span class="post-count">15 min</span>
         </span>
     </span>
 </div>
@@ -109,7 +109,11 @@
     <div class="article-entry" itemprop="articleBody">
        
   <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0 摘要"></a>0 摘要</h1><p>多智能体运动规划（MAMP）是连接式自动驾驶汽车和多机器人系统等应用中的一个关键挑战。在本文中，我们提出了一种用于MAMP的时空冲突解决方法。我们使用一种新的、灵活的基于球体的轨迹离散化来表述这个问题。我们的方法利用深度优先冲突搜索策略来提供解耦方法的可扩展性，同时保持耦合方法的计算保证。我们编写了避免离散化误差和在生成的解中遵守运动学约束的程序。从理论上证明了算法的连续时间可行性和公式空间完备性。<br>实验证明，我们的算法在运行时间和解决方案质量方面与当前技术水平的性能相匹配，同时通过适应静态和动态障碍扩展了当前工作的能力。我们使用开源车辆模拟器CARLA在各种无信号交通路口场景中评估我们的算法。结果显示，在空间受限的环境中，连接和非连接车辆的成功率都有显著提高。此外，我们保持了一个合理的次优比率，在日益复杂的场景中可以很好地扩展。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/ExP6Ygf0.jpg" alt="https://img1.imgtp.com/2023/08/25/ExP6Ygf0.jpg"></p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2302.02266">Space-Time Conflict Spheres for Constrained Multi-Agent Motion Planning</a></p>
+<div align=center>
+<img src=https://img1.imgtp.com/2023/08/25/ExP6Ygf0.jpg width=60% />
+</div>
+
 <span id="more"></span>
 <h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h1><p>互联自动驾驶汽车是一种与基础设施和其他车辆进行通信的自动驾驶汽车。车对车通信实现了CAV之间的协调，这将大大提高道路参与者的安全性[1]、[2]和交通流的效率[3]。我们对交通交叉口[4]的CAV协调特别感兴趣，因为交通交叉口是大多数因人为失误导致的道路事故的发生地[5]。该问题可以被公式化为多智能体运动规划（MAMP），它规划和协调一组智能体之间的轨迹，使得每个智能体可以从其起始位置行进到其目标，而不会与其他智能体或环境发生碰撞。MAMP在监视、搜救、仓库和组装机器人组中也很有用。请参阅[6]了解详细审查。</p>
 <p>MAMP是多智能体路径查找问题（MAPF）的推广，其中时间被离散为时间步长，智能体沿着离散图的边缘移动。找到MAPF的最优解是NP困难的[7]，因此最优MAMP在计算上也是困难的。MAPF通常有两种方法：耦合方法和解耦方法。耦合方法在文献中通常也被称为集中式，解耦方法通常被称为分散或分布式。耦合方法在包含所有智能体的配置空间中搜索解决方案，从而保证最优性和完整性。尽管最近在效率[8]-[10]方面取得了进展，但耦合方法无法摆脱配置空间高维度带来的指数时间复杂性。另一方面，解耦方法在通过冲突解决策略组合路径之前单独考虑智能体路径，这使得处理速度更快，可扩展性更好，但缺点是难以保证完整性和解决方案质量。<br>为了追求计算的可处理性，我们有动力进一步探索解耦方法。</p>
@@ -117,41 +121,31 @@
 <p>由于适用于CAV和其他领域，我们还希望动态障碍物的<strong>连续时间可行性</strong>和<strong>适应性</strong>作为MAMP算法的关键特性。<br>在CAV领域，前一个属性确保生成的解决方案在运行过程中是安全的，后一个属性允许在涉及行人和非连接车辆的常见场景中进行规划。最近在解耦MAPF方面的工作在提供完整性[17]、[18]等计算保证方面表现出色。<strong>然而，很难将MAPF解推广到MAMP问题，因为离散化误差可能会在连续时间内引发新的冲突，并且这些方法不考虑只能提的运动学约束。</strong></p>
 <p>因此，我们陷入了一个困境：<strong>MAMP的离散化允许更容易地制定稳健和高效的算法，但以牺牲连续时间的可行性为代价，因此也牺牲了对现实世界环境的适用性。</strong>另一方面，攻击连续MAMP直接存在计算困难的风险，并使轨迹公式复杂化，这可能反过来限制解决方案的灵活性。一些工作试图将离散解应用于连续问题[19]，[20]，但没有连续时间内可行性的正式证明，因此这些工作中的大部分不适合在现实世界中实现。<br>虽然[21]的作者为他们的离散化策略提供了连续时间可行性的证明，但忽略了动态障碍，这再次阻碍了适用性。当前在时空冲突解决方面的工作[23]既没有上述特征。<strong>据作者所知，我们仍然缺少关于解耦离散MAMP算法的文献，该算法具有连续时间可行性和动态障碍的适应性。</strong></p>
 <p>为了填补这一空白，我们提出了一种新的MAMP解耦方法，称为时空冲突球（STCS）算法。STCS利用基于球体的轨迹离散化来在冲突解决期间在空间和时间上操纵路径。从理论上证明了STCS连续时间的可行性和公式空间的完备性。我们通过实验证明，该算法表现出与当前技术水平相当的性能，同时提供了更大范围的问题设置和更一致的解决方案，即在空间受限且包含动态障碍的环境中。</p>
-<h2 id="1-1-背景"><a href="#1-1-背景" class="headerlink" title="1.1 背景"></a>1.1 背景</h2><ul>
-<li>描述本文解决是什么任务</li>
-<li>问题的背景是什么</li>
-</ul>
-<h2 id="1-2-特点"><a href="#1-2-特点" class="headerlink" title="1.2 特点"></a>1.2 特点</h2><h3 id="1-2-1-现有方法"><a href="#1-2-1-现有方法" class="headerlink" title="1.2.1 现有方法"></a>1.2.1 现有方法</h3><ul>
-<li>现有方法怎么做的，有什么缺点（文章Intro. Review.部分）</li>
-</ul>
-<h3 id="1-2-2-方法特点"><a href="#1-2-2-方法特点" class="headerlink" title="1.2.2 方法特点"></a>1.2.2 方法特点</h3><ul>
-<li>这篇文章改进了什么或者提出了什么（文章Review.部分）</li>
-</ul>
 <h1 id="2-方法"><a href="#2-方法" class="headerlink" title="2 方法"></a>2 方法</h1><p>给出了在连续时间二维空间中包含 $N$ 个半径为 $r$ 的通信智能体的集合 $\mathcal{A}$，其中每个智能体 $\alpha_i \in \mathcal{A}$ 由其起始位置 $q_i^s$、目标位置 $q_i^g$、加速度界 $a^{max}_i$、优先级 $\phi^i$ 和路径刚度$γ^i$ 定义。我们还得到了一个包含 $M$ 个障碍物的工作空间 $\mathcal{W}$，其中每个静态障碍物$o^s_i \in \mathcal{W}$ 都有一个已知的位置，每个动态障碍物 $o^d_i \in \mathcal{W}$ 有一个未知的轨迹。我们假设无噪声主体意图通信和障碍物运动预测。我们使用 $\mathcal{P}$ 来表示智能体和障碍路径的集合。每个路径 $π_i \in \mathcal{P}$ 可以在时空上表示为一个胶囊，我们将其定义为一条半径为 $λ_ r$ 的曲线。胶囊表示类似于半径为 $λ_r$ 的无限多个球体的链。</p>
 <p>我们将这种表示引入了一种新的、灵活的离散化，将其离散化为有限的球体链，并引入了一个要求，即<strong>路径内的相邻球体必须彼此相切</strong>，这种离散表示保持了连续的时间可行性（即没有离散化误差），这意味着可以安全地对路径进行插值以进行智能体运动控制。为了简洁地表示，我们还可以引入一个要求，即路径中的交替球体必须彼此相切，以确保路径始终由最小数量的球体构建。在实践中，我们可以进一步缩放 $r$，以提高通信和预测中对误差的鲁棒性。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/06rQwacT.png" alt="https://img1.imgtp.com/2023/08/25/06rQwacT.png"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/06rQwacT.png" alt=""></p>
 <p>$\mathcal{P}$ 中的所有路径都可以同步存在于一个中心时空网格（<em>space-time grid, STG</em>）内，我们将其定义为 $\mathbb{R}^3$的基为 $\{\hat{x}, \hat{y}, \hat{t}\}$ 的子空间。我们假设每个智能体 $α_i$ 使用某个单智能体运动规划器将路点顺序上传到 STG 中的路径 $π_i$。在实践中，一些集中式基础设施可以在智能体上传和查询数据的同时管理 STG，或者每个智能体可以维护自己的STG副本，并以分散的方式发送和接收广播。</p>
 <p>在 $\mathcal{P}$ 中的所有路径中，属于不同路径的一对球体之间的交集意味着冲突，必须通过STG 中的路径操作来解决冲突。我们使用 $s^r_{i,k}$ 和 $s_{i,k}^{\ast}$ 表示球体 $s_{i,k}$ 的初始（参考）位置和最终（最佳）位置。因此，我们利用基于球体的离散化策略，将冲突解决公式化为 $s^{\ast}_{i,k}\forall(i,k)$ 如下。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/tY7admpC.png" alt="https://img1.imgtp.com/2023/08/25/tY7admpC.png"></p>
-<p><img src="https://img1.imgtp.com/2023/08/25/S2KD9mTm.png" alt="https://img1.imgtp.com/2023/08/25/S2KD9mTm.png"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/tY7admpC.png" alt=""></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/S2KD9mTm.png" alt=""></p>
 <p>在所有智能体路径收敛到其各自目标之后，解决该优化问题以解决冲突将产生MAMP的最优解。然而，这就留下了解决非凸和潜在的大型优化的任务，这有计算困难的风险。相反，可以在每个智能体航路点上传后应用冲突解决方案。正如我们将观察到的那样，将这种方法作为启发式方法，可以快速收敛到合理范围内的次优可行解。</p>
 <h2 id="2-2-SPACE-TIME-CONFLICT-SPHERES"><a href="#2-2-SPACE-TIME-CONFLICT-SPHERES" class="headerlink" title="2.2 SPACE-TIME CONFLICT SPHERES"></a>2.2 SPACE-TIME CONFLICT SPHERES</h2><h3 id="2-2-3-Overview"><a href="#2-2-3-Overview" class="headerlink" title="2.2.3 Overview"></a>2.2.3 Overview</h3><p><strong>STCS 的目标是在形成时解决冲突，同时尽量减少球体在此过程中的总位移。</strong>同时，该算法必须确保在每个路径内<strong>保持连通性</strong>（1c）和<strong>遵守运动学约束</strong>（1d）。<strong>解决一个交叉点可能会形成许多其他交叉点，使这成为一个难题。</strong></p>
 <p><strong>我们从计算解决单对球体之间的相交所需的最小位移这一子问题开始，并通过引入位移矢量（<em>displacement vectors</em>，DV）的思想来解决这一问题</strong>。然后，我们开始考虑球体平移对其单个路径的影响，即通过路径偏移，首先使路径围绕其移位的球体变形，然后应用平滑操作来保持连通性并遵守时间和运动学约束。最后，我们采用了上述两个概念，并使用深度优先范式制定了一个有效的搜索程序，用于收集当前冲突的完整解决方案；我们把这个过程称为冲突搜索。该过程的可视化概述如图1所示。以下三小节中的每一小节都详细介绍了STCS的上述方面之一。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/D5FSZ6YD.jpg" alt="https://img1.imgtp.com/2023/08/25/D5FSZ6YD.jpg"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/D5FSZ6YD.jpg" alt=""></p>
 <h3 id="2-2-4-Displacement-Vectors"><a href="#2-2-4-Displacement-Vectors" class="headerlink" title="2.2.4 Displacement Vectors"></a>2.2.4 Displacement Vectors</h3><p>我们将 <em>outstanding</em> 球体定义为STG中有可能与不同路径的另一个球体相交的球体。我们将解中所有 <em>outstanding</em> 球体的集合表示为 $\mathcal{S}$。每个球体 $s^o_i \in \mathcal{S}$ 都有一个对应的<strong>DV</strong> $\vec{v}_i \in \mathcal{V}$，其中 $\mathcal{V}$ 是所有 <strong>DV</strong> 的集合。我们计算每个 <em>outstanding</em> 球体的向量，使$\vec{v}_i$ 应用于 $s^o_i$ 产生无交集的 STG。</p>
 <p>由 <strong>DVs</strong> 引起的一对相交球体的平移可以被可视化为作用在两个带电粒子之间的排斥力。一般来说，球面 $s^o_i$ 与球面 $s^o_j$ 相交的 DV $\vec{v}^i$ 由 $\vec{v}^i=(2r/||s^o_i−s^o_j||_2-（s^o_i−s^o_j）$给出。$\vec{v}_i$ 的大小是求解交集所需的 $s^o_i$ 的最小位移，假设 $s^o_j$ 是静止的。$\vec{v}^i$ 的方向与 $s^o_i$ 和 $s^o_j$ 之间的相交平面正交（见图2）。在两条路径直接朝着彼此前进的情况下，我们可以在冲突的球体对中的每个DV的角度中引入一个小偏差，以确保路径可以围绕彼此导航。请注意，任何路径中的第一个球体都是不可变的，而任何路径中收敛到其目标的最后一个球体在空间上都是不可改变的。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/ALYV8hwJ.jpg" alt="https://img1.imgtp.com/2023/08/25/ALYV8hwJ.jpg"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/ALYV8hwJ.jpg" alt=""></p>
 <h3 id="2-2-5-Path-Shifts"><a href="#2-2-5-Path-Shifts" class="headerlink" title="2.2.5 Path Shifts"></a>2.2.5 Path Shifts</h3><p>首先在冲突搜索阶段模拟路径偏移，然后最后应用后优化。任何 <em>outstanding</em> 球体沿其<strong>DV</strong>的位移都会导致球体路径内以其为中心的偏移。这可以直观地想象为橡胶棒在被球击中后变形（见图3）。</p>
 <p>对于包含具有 <strong>DV</strong> $\vec{v}_j$ 的 <em>outstanding</em> 球体 $s_o^j$ 的路径 $π_i$，对于每个球体 $s_{i,k}\in π_i$，我们定义了系数：</p>
 <script type="math/tex; mode=display">
 \mu_{i,k}=exp(\gamma_i(d_{i,k}/d_i^{max})^2</script><p>其中 $d_{i,k}$ 是 $s_{i,k}$ 和<em>outstanding</em> 球体 $s^o_j$ 之间的距离，$d^{max}_i$ 是沿 $π_i$ 的任何点与 $s^o_j$ 之间的最大距离（见图第3a）。此外，$γ_i$ 是一个正常数用于分配 $π_i$ 的路径刚度：较大的 $γ_i$ 将碰撞的影响定位在突出的球体周围，而较小的值则会在整个路径上产生共振。然后，每个 $s_{i,k}$ 相应地沿着路径移位向量 $\vec{\phi}_{i,k}=\mu_{i,k}\vec{v}_j$ 平移。通过调整基本运动学方程并对时间进行求解，得到了代理 $α_i$ 在点 $s_{i,k}$ 和 $s_{i,k+1}$ 之间遍历所需的最小时间步长 $(δt)_{i,k}$ 为：</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/YuZU3en0.jpg" alt="https://img1.imgtp.com/2023/08/25/YuZU3en0.jpg"></p>
-<p><img src="https://img1.imgtp.com/2023/08/25/1rH7hNz3.jpg" alt="https://img1.imgtp.com/2023/08/25/1rH7hNz3.jpg"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/YuZU3en0.jpg" alt=""></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/1rH7hNz3.jpg" alt=""></p>
 <p>在应用之后 $\vec{\phi}_{i,k}$ 之后，下面的路径平滑操作是通过向前迭代当前代理路径 $π_i$ 实现，该路径 $π_i$ 计算速度轮廓并通过 $\vec{w}_{i,k}:=\vec{w}_{i,k-1} + a^{max}_i(\delta t)_i \vec{\sigma}_{i,k}$ 和 $t_{i,k}:=max(t_{i,k},t_{i,k-1}+(\delta t)_{i,k})$ 。这种平滑策略通过<strong>最大化速度将轨迹推向其运动学极限，同时确保与运动学约束一致。</strong>对于智能体路径沿一般方向在空间上受到约束的场景，例如交通交叉口的车道标记，引入一个使沿轨迹的某些球体在空间上不可变的要求很简单。</p>
 <h3 id="2-2-6-Conflict-Search"><a href="#2-2-6-Conflict-Search" class="headerlink" title="2.2.6 Conflict Search"></a>2.2.6 Conflict Search</h3><p>我们可以利用三维范围查询数据结构（例如k-d树）在冲突解决的每次迭代期间有效地查询STG内的相交球体对。为了确定突出球体 $\mathcal{S}$ 的集合及其各自的 <strong>DVs</strong> $\mathcal{V}$，我们采用递归的深度优先冲突搜索。我们将 <em>calling</em> 球体定义为在某个当前 STG 状态 $\mathcal{T}_{cur}$ 内的某个指定 <strong>DV</strong> 上平移球体，应用路径偏移，查询进一步的交集，计算交集中涉及的每个球体的 <strong>DV</strong>，最后用它们各自的 <strong>DV</strong> 和新的 STG 状态 $\mathcal{T}_{new}$ <em>calling</em> 这些涉及的球体。当 <em>calling</em> 球体时，这种递归有两种基本情况：如果在当前递归序列中已经访问了球体，则返回 <em>false</em>（不可行）；如果在球体平移和路径移动后不再出现交集，则返回<em>true</em>（可行）。</p>
 <p>通过递归地将每个交集分解为两种情况（例如 移动 s1 vs. 移动 s2），累积一组解 $\mathcal{L}$，其中每个解 $\mathcal{L}_i$ 是解决所有冲突的 $\{\mathcal{S}_i,\mathcal{V}_i\}$ 序列。由于每个交叉点可以分解为两种情况（例如 s1 移动与 s2 移动），因此可以获得多个解。在智能体-障碍物相交的情况下，只能 <em>callling</em> 智能体球体。在链式交叉的情况下（例如，s1 在解决与 s2 的交叉点后与 s3 相交），不能 <em>calling</em> <em>visited</em> (已经访问的) 球体，而要求 <em>calling</em> 一个新球体。</p>
 <p>一旦收集了所有的解，就可以通过最小化目标函数 $\sum^{n}_{i=1} \psi||\vec{v}_i||_2$ 来选择最佳解，其中 $\psi_i$ 是 $s^o_i$ 所属路径的优先级值。注意，该函数是（1a）的精化，只允许操纵 <em>oustanding</em> 的球体，并将这些球体的移动限制在其各自 <strong>DVs</strong> 的大小和方向上。这种公式能够实现并行化的路径优先级，因为轨迹可以同时规划，同时在冲突期间仍然隐含地支持高优先级代理。上述过程在算法1中进行了总结。我们将在定理IV.2中表明，该算法相对于冲突的配置空间 $\mathcal{F}$ 是完整的（见定义IV.2）。</p>
-<p><img src="https://img1.imgtp.com/2023/08/25/WdeED7em.jpg" alt="https://img1.imgtp.com/2023/08/25/WdeED7em.jpg"></p>
+<p><img src="https://img1.imgtp.com/2023/08/25/WdeED7em.jpg" alt=""></p>
 <h1 id="3-亮点及思考"><a href="#3-亮点及思考" class="headerlink" title="3 亮点及思考"></a>3 亮点及思考</h1><ul>
 <li><strong>本文采用类似电子相斥的思想，对智能体路径进行微调，以保持轨迹的连续时间可行性和动态障碍适应性。</strong></li>
 <li><strong>采用深度优先方法，一次性搜索到所有冲突后，然后按顺序解决冲突；此处如果采用冲突树进行求解，效果应该会更好；</strong></li>
