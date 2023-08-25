@@ -41,7 +41,11 @@
           font-size: 1.6rem;
         }
       </style>
-    </head>
+    <!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
   </html>
 </html>
 
@@ -147,6 +151,59 @@
     
     
     
+    
+    <article
+  id="space-time-Space-Time Conflict Spheres for Constrained Multi-Agent Motion Planning"
+  class="article article-type-space-time"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h2 itemprop="name">
+  <a class="article-title" href="/2023/08/25/Space-Time%20Conflict%20Spheres%20for%20Constrained%20Multi-Agent%20Motion%20Planning/"
+    >Space-Time Conflict Spheres for Constrained Multi-Agent Motion Planning</a> 
+</h2>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/08/25/Space-Time%20Conflict%20Spheres%20for%20Constrained%20Multi-Agent%20Motion%20Planning/" class="article-date">
+  <time datetime="2023-08-25T08:45:22.000Z" itemprop="datePublished">2023-08-25</time>
+</a>    
+    </div>
+      
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0 摘要"></a>0 摘要</h1><p>多智能体运动规划（MAMP）是连接式自动驾驶汽车和多机器人系统等应用中的一个关键挑战。在本文中，我们提出了一种用于MAMP的时空冲突解决方法。我们使用一种新的、灵活的基于球体的轨迹离散化来表述这个问题。我们的方法利用深度优先冲突搜索策略来提供解耦方法的可扩展性，同时保持耦合方法的计算保证。我们编写了避免离散化误差和在生成的解中遵守运动学约束的程序。从理论上证明了算法的连续时间可行性和公式空间完备性。<br>实验证明，我们的算法在运行时间和解决方案质量方面与当前技术水平的性能相匹配，同时通过适应静态和动态障碍扩展了当前工作的能力。我们使用开源车辆模拟器CARLA在各种无信号交通路口场景中评估我们的算法。结果显示，在空间受限的环境中，连接和非连接车辆的成功率都有显著提高。此外，我们保持了一个合理的次优比率，在日益复杂的场景中可以很好地扩展。</p>
+<p><img src="https://img1.imgtp.com/2023/08/25/ExP6Ygf0.jpg" alt="https://img1.imgtp.com/2023/08/25/ExP6Ygf0.jpg"></p> 
+      <a class="article-more-link" href="/2023/08/25/Space-Time%20Conflict%20Spheres%20for%20Constrained%20Multi-Agent%20Motion%20Planning/"
+        >阅读更多...</a
+      >
+       
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="tag">论文笔记</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+    
+</article>
+
     
     <article
   id="post-代码仓库创建与推送"
@@ -341,19 +398,11 @@
     </li>
     
     <li class="nav-item">
-      <a class="nav-item-link" href="/categories">分类</a>
-    </li>
-    
-    <li class="nav-item">
       <a class="nav-item-link" href="/tags">标签</a>
     </li>
     
     <li class="nav-item">
-      <a class="nav-item-link" href="/friends">友链</a>
-    </li>
-    
-    <li class="nav-item">
-      <a class="nav-item-link" href="/2019/about">关于我</a>
+      <a class="nav-item-link" href="/2023/about">关于我</a>
     </li>
     
   </ul>
@@ -526,6 +575,30 @@
     viewer_init()
 </script> 
 <!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
 
 <!-- Katex -->
 
