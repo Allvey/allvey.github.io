@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Representation-Optimal Multi-Robot Motion Planning Using Conflict-Based Search |  Allvey&#39;s Count</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="space-time-Representation-Optimal Multi-Robot Motion Planning Using Conflict-Based Search"
+  class="article article-type-space-time"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Representation-Optimal Multi-Robot Motion Planning Using Conflict-Based Search
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/08/28/Representation-Optimal%20Multi-Robot%20Motion%20Planning%20Using%20Conflict-Based%20Search/" class="article-date">
+  <time datetime="2023-08-28T14:01:36.000Z" itemprop="datePublished">2023-08-28</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">3.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">13 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0 摘要"></a>0 摘要</h1><p>多智能体运动规划（MAMP）是为一组智能体计算可行路径的问题，每个智能体在连续状态空间内具有各自的起始状态和目标状态。现有的方法可以分为提供最佳解决方案但难以扩展的耦合方法或提供可扩展解决方案但不提供最优性保证的解耦方法。最近的工作探索了混合方法，该方法在一个更容易的离散子问题——多代理寻路（MAPF）中利用了耦合和解耦方法的优势。在这项工作中，我们将混合MAPF的最新发展应用于MAMP的连续域。我们展示了我们的方法的可扩展性，可以管理多达32个代理的组，展示了处理多达8个高自由度操纵器的能力，并为异构团队进行规划。在所有情况下，我们的方法在提供更高质量解决方案的同时，规划速度明显更快。</p>
+<div align=center>
+<img src=https://img1.imgtp.com/2023/08/28/Dw1pGvbR.jpg width=60% />
+</div>
+
+<span id="more"></span>
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h1><h2 id="1-1-背景"><a href="#1-1-背景" class="headerlink" title="1.1 背景"></a>1.1 背景</h2><p>在自动化制造中，高自由度机械手必须紧密协作 在高效规划的同时避免相互碰撞 动议。在施工现场或 搜救任务必须同样协调碰撞 自由运动。具有大型多智能体团队的电子游戏必须 制定可行的计划。这些只是 多智能体运动规划（MAMP）问题的一些例子。</p>
+<p><strong>鉴于MAMP的复杂性，大多数与多智能体系统相关的研究都集中在解决一个更容易的子问题，即多智能体寻径（MAPF）上。与运动规划问题中考虑的连续空间相反，寻路问题在离散状态空间中操作。<br>MAPF方法通常对所有代理的共享状态表示和状态转换持续时间的一致性进行假设，这阻止了它们直接应用于连续空间MAMP域。因此，许多现实世界中的问题，如高自由度机械手和异构多智能体团队，无法通过离散MAPF技术来解决，因为智能体依赖于唯一的世界表示。一些MAMP方法，如环境网格离散化[1]，将其运动映射到公共环境表示，以处理不相交代理的状态空间表示。不幸的是，这些类型的方法的解决方案质量在很大程度上取决于环境表示。</strong></p>
+<p>MAMP/PF有两种标准方法：耦合和解耦。耦合方法可以提供最优解，但可以在联合状态空间上搜索。解耦方法在每个机器人的个体状态空间上独立搜索，但不能保证完整性或最优性，因为它们在稍后组合之前孤立地探索个体代理状态空间。混合方法试图利用这两种方法的好处。</p>
+<p>在这项工作中，我们提出了一种高效且可扩展的MAMP求解器，该求解器将最近的高效且最优的MAPF技术——基于冲突的搜索（CBS）[2]推广到连续状态空间。我们展示了我们的新MAMP方法CBS-MP，在规划时间和解决方案质量方面都比最先进的MAMP求解器有了显著改进。<br>我们针对标准耦合和解耦概率路线图（Probabilistic Roadmap, PRM）变体以及与ECBS-MP的详细比较验证了我们的方法，ECBS-MP是解决MAMP问题的另一个CBS扩展，特别是状态格问题。</p>
+<p>结果表明，我们提出的方法在各种场景下都提高了性能。我们展示了更高的可扩展性，最多可规划32个代理，而PRM变体无法规划16个代理，并且ECBS-CT只能在一些试验中处理一些16个代理。我们计划最多安装8个高自由度机械手，平均速度是最快PRM变体运行速度的60倍以上。此外，我们还展示了该方法在机械手、移动机器人和航空机器人在同一工作空间中操作的异构问题上的灵活性。除了显著缩短规划时间外，我们还展示了比两种PRM变体更低的成本解决方案。<br>我们的贡献如下：</p>
+<p>将CBS有效扩展到基于采样的运动规划的统一时间离散化过程；</p>
+<p>比现有方法提高性能和可扩展性的最优MAMP方法；</p>
+<p>对该技术的质量进行了理论分析，并对移动、高自由度和异构多机器人系统进行了实验验证。</p>
+<h2 id="1-2-特点"><a href="#1-2-特点" class="headerlink" title="1.2 特点"></a>1.2 特点</h2><h3 id="1-2-1-现有方法"><a href="#1-2-1-现有方法" class="headerlink" title="1.2.1 现有方法"></a>1.2.1 现有方法</h3><p>有两类问题：多代理路径查找（MAPF）和多代理运动规划（MAMP）。MAPF问题由一组代理、一个图以及每个代理的开始和目标位置定义。解决方案由图上的一组无冲突路径组成，将每个代理从起点移动到目标。传统上，解决方案质量是通过成本之和（所有路径的总成本）或完工时间（单个路径的最大值）来衡量的。最佳解决方案最大限度地减少了所需的度量。MAMP是在连续状态空间中为每个代理找到一条在开始和目标之间的可行路径的问题，这通常很难明确表示。这是在离散状态空间上搜索的寻路问题的超集。</p>
+<p>方法可以分为三类：耦合、解耦和混合。在耦合方法中，所有代理路径都是一致计算的。这些方法在所有代理状态的联合空间中工作。他们倾向于通过探索联合空间，为可行的路径和最低成本提供更有力的保证。然而，由于关节C空间的维数随着机器人的数量和自由度的增加而增加，因此它们具有较高的计算成本。</p>
+<p>注意力已经转向解耦算法。不是统一规划所有路径，而是单独规划每条路径。一旦计算出所有路径，就会根据定义的优先级对其进行调整，以避免代理间冲突。解耦方法在单代理空间中工作，允许快速计算具有大量代理的问题的可行路径。然而，单独的代理状态空间是孤立地探索的，随后的解决方案是组合的。这妨碍了确保完整性和最优性，并且经常存在无法在可解问题上找到可行路径的可能性。</p>
+<p>由于在更快的计算时间和找到最佳成本解决方案之间的权衡，研究人员探索了利用耦合和解耦技术的优势的新方法。这些技术被称为混合方法。我们提出的方法，CBS-MP，是一种解决MAMP问题的混合方法。这种方法利用在MAPF空间中开发的技术，为连续空间MAMP创建最佳且可扩展的解决方案。</p>
+<h3 id="1-2-2-方法特点"><a href="#1-2-2-方法特点" class="headerlink" title="1.2.2 方法特点"></a>1.2.2 方法特点</h3><p>许多MAPF方法声称可以提供最佳解决方案。这种最优性是关于它们的输入状态表示或路线图，其被假设为完美的。虽然一些基于采样的运动规划方法提供了渐近最优性，但在任何实际应用中都无法实现真正的最优性。在这项工作中，我们专注于提供一个团队路径，该路径相对于每个个体代理的状态空间的当前表示是最优的。</p>
+<h1 id="2-方法"><a href="#2-方法" class="headerlink" title="2 方法"></a>2 方法</h1><h2 id="2-1-Adapting-CBS-to-Sampling-Based-Motion-Planning"><a href="#2-1-Adapting-CBS-to-Sampling-Based-Motion-Planning" class="headerlink" title="2.1 Adapting CBS to Sampling-Based Motion Planning"></a>2.1 Adapting CBS to Sampling-Based Motion Planning</h2><p>在一般规划问题中，异构代理在不同的连续空间中运行。我们的方法CBS-MP将MAPF-CBS方法（假设共享离散表示）适用于这种更通用的场景。最初，我们使用标准PRM技术为每个代理采样单独的路线图。每个路线图都会增长，直到它包含相应代理的有效路径。顶点表示有效的 <em>configuration</em> 路点，边表示一对顶点之间的有效过渡。每个边都由局部规划器进行验证，该规划器将 <em>configuration</em> 离散为粒度足够细的中间点，以验证相应的连续运动[31]。边也可以表示为称为中间体 (<em>intermediates</em>) 的构型链，路径可以表示为较长的中间体链。路径 <em>intermediates</em> 是一种配置，可以是路线图顶点或边缘中间。</p>
+<p>然后，我们使用CBS的两级框架来查询路线图。虽然高层和底层框架保持不变，但MAPF-CBS无法直接处理PRM离散化。这是由于不相交的单个状态表示以及边缘长度和持续时间的不均匀性。这些问题在 CBS 的冲突检测和解决阶段表现出来。</p>
+<p><img src="https://img1.imgtp.com/2023/08/28/Dw1pGvbR.jpg" alt=""></p>
+<ul>
+<li><p>冲突检测：由于代理运动由边缘表示，因此它们可能具有不同的距离和持续时间。然后，各个路径也将表现出相同的概念。因此，在检查冲突路径之前，必须将它们放在同一时间上下文中。为了实现这一点，我们引入了均匀时间离散化过程。其本质上包括将所有单独的路径离散为统一的时间分辨率段。在不同代理人的路线图中，这些路段的长度可能不同，但每个路段所需的时间与相应代理人所需的持续时间相同。这允许同步每个代理路径上的分段端点序列。端点也可以被视为与相关机器人的配置相对应的路径中间体[31]。使用标准的运动平移碰撞检测方法检查路径中间体是否存在冲突。当检测到冲突时，它由一对中间体 $p_i$，$p_j$ 和时间步长  $t,c=<t, p_i, p_j>$ 组成。无论我们发现的冲突类型是顶点冲突还是边缘冲突，我们的方法都提供了一种更简单、更有效的方法，可以一视同仁地发现和处理冲突。</p>
+</li>
+<li><p>冲突解决：在CBS和大多数变体中，约束直接继承自找到的冲突，并表示在低级别搜索期间必须避免的特定状态。<br>在我们的方法中，约束  $<a_i, t, p_j>$ 由一个代理 $a_i$、时间步长 $t$ 和另一个代理的冲突配置 $p_j$ 组成。<br>满足这种形式的约束的单个代理 $a_i$ 的运动计划必须避免在相应的时间步长 $t$ 与约束配置 $p_j$ 发生冲突。</p>
+</li>
+</ul>
+<pre><code>然后，约束被映射到代理 $a_i$ 的路线图的与 $p_j$ 发生物理冲突的边缘路点 (endpoint)。这意味着约束将包含一组在时间步长 $t$ 不能遍历的边，而不仅仅是在低级别搜索期间要避免的单个状态。这样做需要执行大量的冲突检测调用。为了缓解这个问题，我们在搜索路线图时，先检查约束时间步长是否与边重叠，然后根据约束惰性地评估边，如果是，我们将根据其他代理配置执行冲突检测。否则，我们将继续搜索。？
+</code></pre><ul>
+<li>路线图扩展：在MAMP问题中，可以以解耦的方式验证单个路线图是否包含有效的单代理解决方案，但在不探索复合空间的情况下，尚不清楚当前路线图集是否包含有效团队解决方案。在CBS-MP中，通过扩展冲突树来探索复合空间。</li>
+</ul>
+<pre><code>对树的深入探索（因此需要更长的规划时间）可能是由于需要代理之间非常紧密的协调的问题，也可能是由于路线图不足。
+必须选择让查询继续扩展CT，或者在重新启动查询之前退出并扩展路线图。由于任何一个选项都可能对解决问题是正确的，我们定义了一个概率函数
+
+![](https://img1.imgtp.com/2023/08/28/CMC0KX8J.jpg)
+
+定义在 $CT$ 探索的任何给定点扩展路线图的可能性。该方程旨在随着 $CT$ 节点数量$N$ 的增加，增加退出查询以扩展路线图的概率。此外，随着该方法退出重新采样的次数 $S$ 的增加，退出的概率降低，从而更有可能对 $CT$ 进行更深入的探索。参数 $X$ 和 $α$ 是用户定义的常数，允许函数偏向或偏离额外的路线图扩展。设置 $X=1$ 将强制查询在不展开路线图的情况下搜索整个 $CT$。
+</code></pre><h1 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h1><p>我们设计了三个不同的实验，分别评估高自由度多机器人系统的可扩展性、性能和异构系统的性能。为了测试可扩展性，我们在拥挤的环境中部署大型移动机器人团队。与现有方法相比，我们的方法显示出改进的性能。它是唯一一个能够持续扩展到32个移动机器人团队的方法。</p>
+<p>在第二个实验中，我们考虑了近距离增加数量的10自由度机械手机器人团队。这是唯一一种在保持低规划时间和解决成本的同时解决了8个机械手机器人的所有试验的方法。</p>
+<p>在最后的实验中，CBS-MP在协调异构系统方面表现出更好的性能。这是唯一一种为6个机器人团队解决的方法，同时为3个机器人团队生成更低的规划时间和更稀疏的路线图。</p>
+<p>我们采用正则耦合和解耦的PRM以及ECBS-CT来比较我们的方法。解耦PRM作为一种基于动态障碍物的方法实现，并逐步计算个体代理路径。由于ECBS-CT的性能取决于网格单元大小的选择，我们通过实验确定了每个场景的最佳选择。所有方法都有1000秒的时间来计划尝试失败的时间。</p>
+<p><img src="https://img1.imgtp.com/2023/08/28/xi4GvxQA.jpg" alt=""></p>
+<p><img src="https://img1.imgtp.com/2023/08/28/liRP1Mlf.jpg" alt=""></p>
+<p><img src="https://img1.imgtp.com/2023/08/28/YV6xYVGa.jpg" alt=""></p>
+<h1 id="4-亮点及思考"><a href="#4-亮点及思考" class="headerlink" title="4 亮点及思考"></a>4 亮点及思考</h1><ul>
+<li>简要概括就是：1. 构建概率路网；2. 在路网上检测冲突；3. 直接解决冲突或者扩展路网；方法上似乎没有太大的创新，至少在我个人看来这个方法甚至有点 naive；</li>
+<li>但基于概率路网的方法都有一个特点，那就是概率完备，（这一点作者在前面也提到：尽管概率完备，但想要接近完备，所需的时间代价是很高的），本文方法似乎也没能逃出这个魔咒，尽管作者声称其是完备的；</li>
+<li>基于随机采样的规划方法都有一个很大的弊端，一旦环境非常狭窄，采样代价一般都较大；而且它是概率完备和最优的，那想要得到一个不错的解，成本就更大了，效果可能还不如混合A*等基于搜索的方法，毕竟人家一旦生成路径就是最优的。</li>
+</ul>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          Donate
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/08/28/Representation-Optimal%20Multi-Robot%20Motion%20Planning%20Using%20Conflict-Based%20Search/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="tag">论文笔记</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/08/25/Space-Time%20Conflict%20Spheres%20for%20Constrained%20Multi-Agent%20Motion%20Planning/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Space-Time Conflict Spheres for Constrained Multi-Agent Motion Planning</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Allvey&#39;s Count"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/2023/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
