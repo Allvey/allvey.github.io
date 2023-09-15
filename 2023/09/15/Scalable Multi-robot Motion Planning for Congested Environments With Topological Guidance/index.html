@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Scalable Multi-robot Motion Planning for Congested Environments With Topological Guidance |  Allvey&#39;s County</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="scalable-Scalable Multi-robot Motion Planning for Congested Environments With Topological Guidance"
+  class="article article-type-scalable"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Scalable Multi-robot Motion Planning for Congested Environments With Topological Guidance
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/09/15/Scalable%20Multi-robot%20Motion%20Planning%20for%20Congested%20Environments%20With%20Topological%20Guidance/" class="article-date">
+  <time datetime="2023-09-15T09:12:43.000Z" itemprop="datePublished">2023-09-15</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> Word count:</span>
+            <span class="post-count">5.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> Reading time≈</span>
+            <span class="post-count">18 min</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0 摘要"></a>0 摘要</h1><p>多机器人运动规划（MRMP）是在连续状态空间中为一组机器人寻找无碰撞路径的问题。MRMP的难度随着机器人的数量而增加，并且在机器人必须通过的狭窄通道的环境中会加剧，比如需要机器人之间协调的仓库通道。<br>在单机器人环境中，拓扑引导的运动规划方法在这些受限环境中表现出了改进的性能。在这项工作中，我们将现有的拓扑导引单机器人运动规划方法扩展到多机器人领域，以利用拓扑导引提供的改进效率。我们展示了我们的方法在有许多狭窄通道的复杂环境中有效规划路径的能力，可以扩展到规模比这类问题中现有方法大25倍的机器人团队。通过利用环境拓扑的知识，我们还可以找到比其他方法更高质量的解决方案。</p>
+<p><div align=center>
+<img src=https://img1.imgtp.com/2023/09/15/dW0S80Uk.jpg width=60% />
+</div><br><span id="more"></span></p>
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h1><h2 id="1-1-背景"><a href="#1-1-背景" class="headerlink" title="1.1 背景"></a>1.1 背景</h2><p>多机器人系统已经在许多环境中变得无处不在，例如自主工厂和仓库。当两个或多个机器人的运动发生冲突时，需要高度协调的多机器人运动规划（MRMP）来避免彼此之间以及与环境的碰撞。</p>
+<p>现有的MRMP方法在开放环境中表现良好，但由于难以避免在狭小空间内与障碍物碰撞，难以通过狭窄的通道（如仓库过道）。对于多机器人团队，狭窄的通道可能会因机器人之间的碰撞而引入或加剧，从而使规划更加复杂。MRMP方法有三类：</p>
+<ul>
+<li>解耦方法，分别为每个机器人规划一条路径，并提供最少的协调；</li>
+<li>耦合方法，在复合空间中规划，结合了所有机器人的自由度；</li>
+<li>混合方法，提供耦合和解耦规划的混合。</li>
+</ul>
+<p>解耦方法（例如，解耦PRM[1]）允许随着机器人数量的线性缩放；然而，它们缺乏解决复杂的机器人间碰撞所需的协调。耦合方法（例如，复合RRT[2]和复合PRM[1]）提供了这种协调，但考虑到大的搜索空间，这对于大型团队来说在计算上变得难以处理。混合方法（例如，CBS-MP[3]和M*[4]）利用了解耦方法的可扩展性以及提高的协调水平。然而，在通道狭窄的环境中，机器人之间可能发生碰撞，它们的性能受到解决冲突时间的限制。在这项工作中，我们提出了一种耦合方法，该方法利用拓扑引导来更智能、更有效地搜索复合空间。</p>
+<p>引导式规划方法利用外部信息有效地找到路径。拓扑引导方法[5]–[7]利用环境的表示来指导狭窄通道的运动规划。拓扑骨架是对环境进行编码的嵌入图。先前的工作[5]，[6]已经探索了围绕骨架的指导规划。</p>
+<p>在这项工作中，我们将拓扑骨架制导（<em>topological skeleton guidance</em>）扩展到多机器人系统，以在通道狭窄的环境中为大型团队提供所需的协调水平。我们提出了复合动态区域偏置快速探索随机树（<em>Composite Dynamic Region-biased Rapidly-exploring Random Trees</em>, CDR-RRT），这是一种利用工作空间拓扑知识的耦合MRMP方法，在保持概率完整性的同时缩短了规划时间。与现有的最先进的方法相比，我们展示了显著提高的可扩展性，成功地为规模高达25倍的团队在可能发生机器人间碰撞的复杂环境中找到了路径。我们的贡献包括：</p>
+<ul>
+<li>工作空间骨架（<em>workspace skeletons</em>）和采样区域（<em>sampling regions</em>）的新型复合空间（<em>composite-space</em>）类似物的开发。</li>
+<li>可扩展、可能完整的MRMP方法拓扑指导，以解决需要高度协调的问题。</li>
+<li>在各种拥挤与开放环境进行实验验证，并扩大机器人团队规模。</li>
+</ul>
+<h2 id="1-2-特点"><a href="#1-2-特点" class="headerlink" title="1.2 特点"></a>1.2 特点</h2><h3 id="1-2-1-现有方法"><a href="#1-2-1-现有方法" class="headerlink" title="1.2.1 现有方法"></a>1.2.1 现有方法</h3><h3 id="1-2-1-Motion-Planning-Preliminaries"><a href="#1-2-1-Motion-Planning-Preliminaries" class="headerlink" title="1.2.1 Motion Planning Preliminaries"></a>1.2.1 Motion Planning Preliminaries</h3><p>机器人的自由度（<em>degrees of freedom</em>，DOF）包括其在工作空间中的位置和方向、机器人物理存在的2D或3D空间，以及其他可配置值，如关节角度。<em>configuration</em> 是一组描述机器人自由度的值。配置空间（$C_{space}$）是所有机器人配置的集合[8]。自由空间（$C_{free}$）是 $C_{space}$ 的子集，它只包含有效的配置（例如，不与障碍物碰撞的配置）。障碍物空间（$C_{obst}$）包含所有无效的配置。给定开始配置 $q_{start}$ 和目标配置 $q_{goal}$，运动规划问题努力通过 $C_{free}$ 找到从 $q_{start}$ 到  $q_{goal}$ 的路径。</p>
+<p>搜索整个 $C_{space}$ 是棘手的[9]，[10]，导致出现了基于采样的运动规划算法[2]，[11]。这些算法放弃了完整性保证，转而支持更快的规划和概率完整性，这意味着找到解决方案的概率（如果存在）在规划时间的上限内收敛为1。不幸的是，这些随机采样技术在受限环境中受到影响[12]，在那里它们面临着窄通道问题。这是指在狭窄的走廊内对有效配置进行采样的困难，这些走廊按体积占自由空间的比例很小。</p>
+<p>构成我们方法基础的基于采样的运动规划算法是快速探索随机树（RRT）[2]。该方法从 $q_{start}$ 到$q_{target}$ 迭代地生长一棵树 <strong><em>T</em></strong>。在每次迭代期间，对随机配置 $q_{rand}$ 进行采样。然后我们找到 $q_{near}$，即 <strong><em>T</em></strong> 中最接近 $q_{rand}$ 的构型。然后，<strong><em>T</em></strong> 在 $q_{rand}$ 方向上从 $q_{near}$ 延伸最大距离 <strong>∆</strong>。RRT 表现出Voronoi 偏差，这导致了对 $C_{space}$ 的快速探索，并使RRT成为处理单查询运动规划问题的有效方法。RRT变体已被开发用于在狭窄通道存在的情况下提高性能[13]，[14]。</p>
+<h3 id="1-2-2-Multi-robot-Motion-Planning"><a href="#1-2-2-Multi-robot-Motion-Planning" class="headerlink" title="1.2.2 Multi-robot Motion Planning"></a>1.2.2 Multi-robot Motion Planning</h3><p>多机器人运动规划包括为一组机器人在各自的起点和目标之间找到有效的路径。复合空间是 <strong><em>n</em></strong> 个单独机器人的配置空间中的每一个的笛卡尔乘积：$C_{composite}=C_1×C_2×\cdots×C_n$，其中 $C_i$ 表示机器人 $i$ 的 $C_{space}$。复合配置由每个机器人的 DOF 的值组成。复合自由空间由所有有效的配置组成，使得没有机器人与另一个机器人碰撞。MRMP问题可以公式化为在复合自由空间中寻找连续路径。</p>
+<p>表一比较了选定的MRMP方法。解耦方法，如Decoupled PRM[1]，在它们自己的解耦配置空间中规划单个机器人路径，因此不能提供完整性或最优性保证。缺乏协调会降低它们在狭窄通道中的性能，在狭窄通道内，仅使用速度调节可能无法避免沿单个路径发生机器人间碰撞。</p>
+<p>耦合方法，如Composite PRM[1]和Composite RRT[2]，直接在Composite Cspace中进行规划。其他复合方法（例如，MRdRRT[15]）构建单独的机器人路线图，然后搜索隐含的复合路线图。这些方法保持了它们使用的单个机器人方法的概率完整性。然而，由于单独的路线图构建是解耦的，他们缺乏在狭窄通道的拥挤环境中有效寻找路径所需的协调水平。</p>
+<p>CBS-MP[3]、MAPF/C[16]和M*[4]等混合方法试图利用耦合和解耦方法的优势。例如，CBS-MP[3]在其解耦的 $C_{space}$ 中规划单个机器人路径，然后协调复合 $C_{space}$ 中的路径。在最坏的情况下，这些方法将探索整个复合 $C_{space}$，但平均而言，running time 与解耦方法相当，同时提供不同级别的概率完整性和表示最优性保证。这些方法通常不太适合通道狭窄的环境，这是由于将规划器从解耦转换到所需的高水平协调所花费的计算工作量。在这里，我们提出了一种复合空间RRT构建方法，同时利用拓扑引导来提高在狭窄通道环境中的性能。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/isJP00Ry.jpg" alt="https://img1.imgtp.com/2023/09/15/isJP00Ry.jpg"></p>
+<h3 id="1-2-3-Guided-Motion-Planning"><a href="#1-2-3-Guided-Motion-Planning" class="headerlink" title="1.2.3 Guided Motion Planning"></a>1.2.3 Guided Motion Planning</h3><p>拓扑制导 （<em>topological guidance</em>）在复合空间中还没有得到很好的探索；然而，一些混合方法已经探索了使用拓扑信息来构建解耦路线图。Ryan[17]将工作空间分解为 <em>halls</em> 和 <em>open spaces</em>，<em>halls</em> 由单独连接的顶点链表示，<em>open spaces</em> 由完全连接的子图表示。Yu等人[18]提出了一种通过在工作空间上覆盖网格结构来构建路线图的方法。他们表明，这种方法可以在相对开放的环境中为大型机器人群体提供有效的路径规划。</p>
+<p>已经提出了几种单机器人运动规划策略来适应工作空间的规划。特征敏感运动规划策略[19]试图将环境细分为单独规划的同质工作空间区域，使路线图构建适应局部特征。各个路线图被合并为规划空间的完整路线图。这种策略使规划者能够有效地使用资源。</p>
+<p>工作空间分解策略[20]–[22]有助于将规划集中在工作空间的狭窄区域。SyClop[23]使用RRT对边界分解区域进行采样。用户引导的规划策略[24]允许用户定义和操作规划器实时探索的工作空间采样区域。规划者依靠用户的直觉来识别狭窄的通道并更快地找到路径。</p>
+<p>基于骨架的策略使用嵌入图来利用工作空间的拓扑结构（<strong>图2(a)</strong>），该嵌入图与工作空间是等价的。工作空间中的所有点都可以平滑地折叠到骨架中[25]。骨架边描述自由工作空间的连续体积（例如，隧道或房间），顶点表示这些体积之间的连接。给定环境，骨架是预先计算的，可以用于多个查询和不同类型的机器人。示例包括2D中的中轴骨架[26]和3D中的平均曲率骨架[27]。骨骼通常计算速度很快。例如，中轴骨架可以在 $O(nlogn)$ 时间内计算，其中 $n$ 是障碍物边缘的数量[28]。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/GCzVSYiS.jpg" alt="https://img1.imgtp.com/2023/09/15/GCzVSYiS.jpg"></p>
+<p>使用 PRM 的动态区域采样（DR-PRM）[6]，在骨架的顶点启动局部组件，沿相邻边展开它们，然后合并它们以形成完整的路线图。分层注释骨架规划[29]通过随着时间的推移放松对骨架边缘的依赖来扩展DR-PRM。我们在第II-D节中详细描述了DR-PRM的单一查询对应项，即动态区域偏置RRT（DR-RRT），因为我们从中扩展了我们的方法。这些方法显示了当它们密切相关时，使用工作空间信息来指导 $C_{space}$ 中的规划的优势；然而，它们被限制为单个机器人设置。</p>
+<h3 id="1-2-4-Dynamic-Region-biased-RRT"><a href="#1-2-4-Dynamic-Region-biased-RRT" class="headerlink" title="1.2.4 Dynamic Region-biased RRT"></a>1.2.4 Dynamic Region-biased RRT</h3><p><img src="https://img1.imgtp.com/2023/09/15/NP8LCOcx.png" alt="https://img1.imgtp.com/2023/09/15/NP8LCOcx.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/2bfWEpqa.png" alt="https://img1.imgtp.com/2023/09/15/2bfWEpqa.png"></p>
+<p>DR-RRT[5]（Alg.1）在约束沿着骨架前进的区域内的采样的同时增长RRT。</p>
+<ul>
+<li><strong>查询骨架：*</strong>算法1* 创建两个骨架：一个用于整个工作空间（第1行），另一个用于查询骨架（图2（b）；第2行），其在工作空间中仅保留沿着从起点到目标的路径的边。</li>
+<li><strong>采样区域：</strong>采样区域将沿着查询骨架的边缘前进，使用骨架（工作空间中的一种解决方案）来指导RRT（$C_{space}$ 中的一个解决方案）的构建。<strong>区域是工作空间中的有界体积，例如，边界球体。</strong>RRT的构建开始于初始化以最接近 $q_{start}$ 的骨架顶点为中心的第一个区域（第4行）。在每次迭代期间，算法2选择一个区域来指导采样（第1行）。选择一个区域的概率与其扩展成功率成正比。为了保持概率完整性，以较小的概率选择整个环境（见第III-E节）。从该区域中选择随机配置$q_{rand}$ 以使树朝向（第3行）生长。<br>然后，通过尝试将树扩展到 $q_{new}$（第4行），该算法作为一般RRT进行。基于该尝试的结果来更新扩展成功率（第7-10行）。</li>
+<li><strong>区域推进</strong>：一旦将配置添加到树中，所有与 $q_{new}$ 接触的区域都将沿着其骨架边缘向前推进，直到它们将 $q_{new}$ 留在后面（Alg.2，第11-13行）。任何到达其边缘末端或超过最大扩展失败次数的区域都将被删除（第14-17行）。然后，在 $q_{new}$ 的小距离内的每个未探索的骨架顶点上创建新的区域（第18-21行）。这个区域选择、树扩展、区域推进和区域创建的循环一直持续到树扩展到 $q_{target}$。</li>
+</ul>
+<h3 id="1-2-2-方法特点"><a href="#1-2-2-方法特点" class="headerlink" title="1.2.2 方法特点"></a>1.2.2 方法特点</h3><ul>
+<li>这篇文章改进了什么或者提出了什么（文章Review.部分）</li>
+</ul>
+<h1 id="2-METHOD"><a href="#2-METHOD" class="headerlink" title="2 METHOD"></a>2 METHOD</h1><h2 id="2-1-COMPOSITE-DYNAMIC-REGION-BIASED-RRT"><a href="#2-1-COMPOSITE-DYNAMIC-REGION-BIASED-RRT" class="headerlink" title="2.1 COMPOSITE DYNAMIC REGION-BIASED RRT"></a>2.1 COMPOSITE DYNAMIC REGION-BIASED RRT</h2><p>在本文中，我们将DR-RRT扩展到多机器人系统，提出了一种新的方法，即复合动态区域偏置RRT（CDR-RRT）。由于搜索空间的指数大小，我们将复合空间的探索限制在可能产生解决方案的区域。我们通过为工作空间骨架和区域开发复合模拟物（<em>composite analogs</em>）来实现这一点，该模拟物允许耦合多机器人运动规划，同时利用DR-RRT中的拓扑引导。当我们利用贪婪启发式来搜索复合空间时，我们利用了复合骨架（<em>Composite Skeleton</em>）的懒惰构造（<em>lazy construction</em>）。</p>
+<h3 id="2-1-1-Composite-Skeleton"><a href="#2-1-1-Composite-Skeleton" class="headerlink" title="2.1.1 Composite Skeleton"></a>2.1.1 Composite Skeleton</h3><p><img src="https://img1.imgtp.com/2023/09/15/IvfHc5U7.png" alt="https://img1.imgtp.com/2023/09/15/IvfHc5U7.png"></p>
+<p>由于复合空间是每个机器人的 $C$ 空间的笛卡尔乘积，因此复合骨架（图3）是 <em>n</em> 个机器人中每个机器人的工作空间骨架的笛卡尔乘积。它由复合顶点和边组成，分别表示n个机器人所在的工作空间骨架中的一组 <em>n</em> 个顶点或边。我们通过使用局部按需构造来避免与全复合骨架图的计算相关的指数展开。一个复合区域由 <em>n</em> 个单独的采样区域组成，每个机器人的工作空间中有一个采样区域。</p>
+<p>计算复合查询骨架（<em>composite query skeleton</em>）是复合骨架的定向和修剪版本，需要对复合骨架进行显式计算。相反，我们启发式地构建和搜索复合骨架，每次一条边，只考虑可能沿着从 $q_{start}$ 到$q_{target}$ 的可行低成本路径的边。我们在第III-C节中讨论了捕获这些边的启发式方法。</p>
+<h3 id="2-1-2-Guided-Composite-RRT-Construction"><a href="#2-1-2-Guided-Composite-RRT-Construction" class="headerlink" title="2.1.2 Guided Composite RRT Construction"></a>2.1.2 Guided Composite RRT Construction</h3><p>为了开始RRT构建，我们计算要探索的第一个复合骨架边。第III-C节讨论了通过从源复合顶点生长复合骨架来构建复合骨架边。CDRRRT然后作为DR-RRT进行，通过迭代地执行区域偏置采样、RRT生长、区域推进和删除，以及新的区域创建，直到达到 $q_{target}$。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/BJxUadRK.png" alt="https://img1.imgtp.com/2023/09/15/BJxUadRK.png"></p>
+<p>在CDR-RRT的每次迭代期间，算法3选择一个复合区域 $r$。在从 $r$ 采样并扩展树之后，我们向前推进$r$，直到它留下 $q_{new}$（第12行）。在DR-RRT[5]中，当各个区域沿着骨架边缘前进时，它们以沿着边缘的中间点为中心。相应地，我们沿着复合骨架边缘创建复合中间体。在复合区域前进中，如图4所示，所有单个区域向前前进最小量的中间体，使得复合区域不再接触 $q_{new}$。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/KSl2XVG3.png" alt="https://img1.imgtp.com/2023/09/15/KSl2XVG3.png"></p>
+<p>当复合区域在其边的末端到达目标顶点时，我们将从该顶点向复合骨架添加一条传出边，并生成一个新区域（Alg.4）。<br>当一个区域超过 $τ$ 失败的扩展尝试时，它被删除并替换为新的区域（第22行）。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/U6SwVkii.png" alt="https://img1.imgtp.com/2023/09/15/U6SwVkii.png"></p>
+<h3 id="2-1-3-Multi-agent-Pathfinding-Heuristic"><a href="#2-1-3-Multi-agent-Pathfinding-Heuristic" class="headerlink" title="2.1.3 Multi-agent Pathfinding Heuristic"></a>2.1.3 Multi-agent Pathfinding Heuristic</h3><p>在给定源复合顶点 $V$（<strong>Alg.4</strong>）的情况下，<strong>我们使用多智能体寻路（MAPF）启发式方法来识别下一条要探索的边。</strong>MAPF是MRMP问题的离散状态空间等价物。我们使用MAPF为每个机器人生成一条从 $V$ 到最接近每个机器人目标的顶点的路径（<strong>Alg.4, 第3行</strong>）。我们通过考虑机器人之间潜在的碰撞来确保这些单独的路径是可行的。我们将单个骨架边缘的容量定义为边缘上障碍物之间的最小宽度。如果穿越该边缘的机器人的总宽度超过了容量，则会发生冲突。这些冲突通过MAPF算法来解决。</p>
+<p>我们从生成的MAPF解决方案（<strong>Alg.4, 第4行</strong>）中提取复合骨架边，并迭代创建一个区域来遍历每条边。如果一个区域超过了遍历边的最大扩展失败次数，我们认为该边失败了，并施加了一个约束，即没有进一步的MAPF解决方案可以包含该复合骨架边（图第5（a）段；<strong>Alg.3, 第17行</strong>）。我们还增加了每个源复合骨架顶点所看到的失败增长尝试的数量。<br>为了避免花费过多的计算来探索复合骨架中不太可能产生路径的区域，如果一个顶点超过了增长失败的最大次数，我们回溯到它的前一个顶点（图第5（b）段）；<strong>Alg.4, 第2行</strong>）。</p>
+<p><img src="https://img1.imgtp.com/2023/09/15/14XEJwiM.png" alt="https://img1.imgtp.com/2023/09/15/14XEJwiM.png"></p>
+<h3 id="2-1-4-Implementation-Details"><a href="#2-1-4-Implementation-Details" class="headerlink" title="2.1.4 Implementation Details"></a>2.1.4 Implementation Details</h3><p>为了生成MAPF解决方案，我们调整了基于冲突的搜索（CBS）[30]和基于优先级的搜索（PBS）[31]。两者都使用分层方法，低级别搜索为每个代理查找单独的路径，高级别搜索解决路径之间的冲突。CBS找到了与完工时间有关的最佳路径，而PBS已被证明在一个机器人的最佳路径阻挡其他机器人的路径的情况下可以提高性能。</p>
+<p>完整的复合骨架的大小是机器人数量的指数级，因此我们通过利用复合骨架的局部构造来优化内存使用。当复合顶点和边不再有用时，我们也可以删除它们。当穿过复合边的复合区域到达终点并被删除时，复合边不再有用。当复合顶点的所有传入边和传出边都不再有用时，复合顶点就不再有用。</p>
+<h3 id="2-1-5-Theoretical-Analysis"><a href="#2-1-5-Theoretical-Analysis" class="headerlink" title="2.1.5 Theoretical Analysis"></a>2.1.5 Theoretical Analysis</h3><p>定理：CDR-RRT是概率完备的。<br>证明：在CDR-RRT的每次迭代过程中，从整个环境而不是在一个区域内进行采样的概率为 $ε &gt;0$（<strong>Alg.3，第1行</strong>）。从整个环境中采样可以保证概率的完整性，确保找到从 $q_{start}$ 到 $q_{target}$ 的有效路径（如果存在的话），即使所有区域都无法生成有效的配置。随着 ε 增加到 1，或者随着区域的大小增加以涵盖整个工作空间，工作空间拓扑的知识被利用得更少，并且该方法最终减少到复合 RRT。</p>
+<h1 id="3-VALIDATION"><a href="#3-VALIDATION" class="headerlink" title="3 VALIDATION"></a>3 VALIDATION</h1><p><img src="https://img1.imgtp.com/2023/09/15/T1IzhBmq.png" alt="https://img1.imgtp.com/2023/09/15/T1IzhBmq.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/ftL6ytHM.png" alt="https://img1.imgtp.com/2023/09/15/ftL6ytHM.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/qys6JUM7.png" alt="https://img1.imgtp.com/2023/09/15/qys6JUM7.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/gDJVqc56.png" alt="https://img1.imgtp.com/2023/09/15/gDJVqc56.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/TCSNWBlC.png" alt="https://img1.imgtp.com/2023/09/15/TCSNWBlC.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/ZJmfIY2B.png" alt="https://img1.imgtp.com/2023/09/15/ZJmfIY2B.png"></p>
+<p><img src="https://img1.imgtp.com/2023/09/15/quUoNpvV.png" alt="https://img1.imgtp.com/2023/09/15/quUoNpvV.png"></p>
+<h1 id="3-亮点"><a href="#3-亮点" class="headerlink" title="3 亮点"></a>3 亮点</h1><aside>
+☑️ 相比Dynamic Region-biased RRT 方法，本文方法将其扩展到了多机器人领域，主要改进点在于：
+1. 引入Region 走到头的时候（抵达拓扑路段终点），采用 MAPF 方法进行扩展选择；
+2. 引入回溯功能，在一定程度上可以避免死锁；
+
+</aside>
+
+<aside>
+🚫 最大的问题在于：本身全局RRT方法都没办法保证最优性，再基于拓扑引导进行采样规划，最优性会进一步下降，相当于牺牲了部分最优性以换取计算效率。
+
+</aside>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>Copyright： </strong>
+          
+          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2023/09/15/Scalable%20Multi-robot%20Motion%20Planning%20for%20Congested%20Environments%20With%20Topological%20Guidance/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/08/28/Representation-Optimal%20Multi-Robot%20Motion%20Planning%20Using%20Conflict-Based%20Search/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Representation-Optimal Multi-Robot Motion Planning Using Conflict-Based Search</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="Allvey&#39;s County"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/2023/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="Search">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i></p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
