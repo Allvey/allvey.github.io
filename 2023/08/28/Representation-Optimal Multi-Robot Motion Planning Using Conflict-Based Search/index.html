@@ -110,7 +110,7 @@
        
   <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0 摘要"></a>0 摘要</h1><p>多智能体运动规划（MAMP）是为一组智能体计算可行路径的问题，每个智能体在连续状态空间内具有各自的起始状态和目标状态。现有的方法可以分为提供最佳解决方案但难以扩展的耦合方法或提供可扩展解决方案但不提供最优性保证的解耦方法。最近的工作探索了混合方法，该方法在一个更容易的离散子问题——多代理寻路（MAPF）中利用了耦合和解耦方法的优势。在这项工作中，我们将混合MAPF的最新发展应用于MAMP的连续域。我们展示了我们的方法的可扩展性，可以管理多达32个代理的组，展示了处理多达8个高自由度操纵器的能力，并为异构团队进行规划。在所有情况下，我们的方法在提供更高质量解决方案的同时，规划速度明显更快。</p>
 <div align=center>
-<img src=https://img1.imgtp.com/2023/08/28/Dw1pGvbR.jpg width=60% />
+<img src=https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-28%20215337.jpg width=60% />
 </div>
 
 <span id="more"></span>
@@ -129,7 +129,11 @@
 <h3 id="1-2-2-方法特点"><a href="#1-2-2-方法特点" class="headerlink" title="1.2.2 方法特点"></a>1.2.2 方法特点</h3><p>许多MAPF方法声称可以提供最佳解决方案。这种最优性是关于它们的输入状态表示或路线图，其被假设为完美的。虽然一些基于采样的运动规划方法提供了渐近最优性，但在任何实际应用中都无法实现真正的最优性。在这项工作中，我们专注于提供一个团队路径，该路径相对于每个个体代理的状态空间的当前表示是最优的。</p>
 <h1 id="2-方法"><a href="#2-方法" class="headerlink" title="2 方法"></a>2 方法</h1><h2 id="2-1-Adapting-CBS-to-Sampling-Based-Motion-Planning"><a href="#2-1-Adapting-CBS-to-Sampling-Based-Motion-Planning" class="headerlink" title="2.1 Adapting CBS to Sampling-Based Motion Planning"></a>2.1 Adapting CBS to Sampling-Based Motion Planning</h2><p>在一般规划问题中，异构代理在不同的连续空间中运行。我们的方法CBS-MP将MAPF-CBS方法（假设共享离散表示）适用于这种更通用的场景。最初，我们使用标准PRM技术为每个代理采样单独的路线图。每个路线图都会增长，直到它包含相应代理的有效路径。顶点表示有效的 <em>configuration</em> 路点，边表示一对顶点之间的有效过渡。每个边都由局部规划器进行验证，该规划器将 <em>configuration</em> 离散为粒度足够细的中间点，以验证相应的连续运动[31]。边也可以表示为称为中间体 (<em>intermediates</em>) 的构型链，路径可以表示为较长的中间体链。路径 <em>intermediates</em> 是一种配置，可以是路线图顶点或边缘中间。</p>
 <p>然后，我们使用CBS的两级框架来查询路线图。虽然高层和底层框架保持不变，但MAPF-CBS无法直接处理PRM离散化。这是由于不相交的单个状态表示以及边缘长度和持续时间的不均匀性。这些问题在 CBS 的冲突检测和解决阶段表现出来。</p>
-<p><img src="https://img1.imgtp.com/2023/08/28/Dw1pGvbR.jpg" alt=""></p>
+<!-- ![](https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-25%20181345.jpg) -->
+<div align=center>
+<img src=https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-25%20181345.jpg width=60% />
+</div>
+
 <ul>
 <li><p><strong>冲突检测</strong>: 由于代理运动由边缘表示，因此它们可能具有不同的距离和持续时间。然后，各个路径也将表现出相同的概念。<strong>因此，在检查冲突路径之前，必须将它们放在同一时间上下文中。为了实现这一点，我们引入了均匀时间离散化过程。其本质上包括将所有单独的路径离散为统一的时间分辨率段。</strong>在不同代理人的路线图中，这些路段的长度可能不同，但每个路段所需的时间与相应代理人所需的持续时间相同。这允许同步每个代理路径上的分段端点序列。端点也可以被视为与相关机器人的配置相对应的路径中间体[31]。使用标准的运动平移碰撞检测方法检查路径中间体是否存在冲突。当检测到冲突时，它由一对中间体 $p_i$，$p_j$ 和时间步长  $t,c=<t, p_i, p_j>$ 组成。无论我们发现的冲突类型是顶点冲突还是边缘冲突，我们的方法都提供了一种更简单、更有效的方法，可以一视同仁地发现和处理冲突。</p>
 </li>
@@ -142,17 +146,32 @@
 </ul>
 <pre><code>**对树的深入探索（因此需要更长的规划时间）可能是由于需要代理之间非常紧密的协调的问题，也可能是由于路线图不足。**
 **必须选择让查询继续扩展CT，或者在重新启动查询之前退出并扩展路线图。**由于任何一个选项都可能对解决问题是正确的，我们定义了一个概率函数
+</code></pre><div align=center>
+<img src=https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-28%20215700.jpg width=60% />
+</div>
 
-![](https://img1.imgtp.com/2023/08/28/CMC0KX8J.jpg)
-
-定义在 $CT$ 探索的任何给定点扩展路线图的可能性。该方程旨在随着 $CT$ 节点数量$N$ 的增加，增加退出查询以扩展路线图的概率。此外，随着该方法退出重新采样的次数 $S$ 的增加，退出的概率降低，从而更有可能对 $CT$ 进行更深入的探索。参数 $X$ 和 $α$ 是用户定义的常数，允许函数偏向或偏离额外的路线图扩展。设置 $X=1$ 将强制查询在不展开路线图的情况下搜索整个 $CT$。
+<pre><code>定义在 $CT$ 探索的任何给定点扩展路线图的可能性。该方程旨在随着 $CT$ 节点数量$N$ 的增加，增加退出查询以扩展路线图的概率。此外，随着该方法退出重新采样的次数 $S$ 的增加，退出的概率降低，从而更有可能对 $CT$ 进行更深入的探索。参数 $X$ 和 $α$ 是用户定义的常数，允许函数偏向或偏离额外的路线图扩展。设置 $X=1$ 将强制查询在不展开路线图的情况下搜索整个 $CT$。
 </code></pre><h1 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h1><p>我们设计了三个不同的实验，分别评估高自由度多机器人系统的可扩展性、性能和异构系统的性能。为了测试可扩展性，我们在拥挤的环境中部署大型移动机器人团队。与现有方法相比，我们的方法显示出改进的性能。它是唯一一个能够持续扩展到32个移动机器人团队的方法。</p>
 <p>在第二个实验中，我们考虑了近距离增加数量的10自由度机械手机器人团队。这是唯一一种在保持低规划时间和解决成本的同时解决了8个机械手机器人的所有试验的方法。</p>
 <p>在最后的实验中，CBS-MP在协调异构系统方面表现出更好的性能。这是唯一一种为6个机器人团队解决的方法，同时为3个机器人团队生成更低的规划时间和更稀疏的路线图。</p>
 <p>我们采用正则耦合和解耦的PRM以及ECBS-CT来比较我们的方法。解耦PRM作为一种基于动态障碍物的方法实现，并逐步计算个体代理路径。由于ECBS-CT的性能取决于网格单元大小的选择，我们通过实验确定了每个场景的最佳选择。所有方法都有1000秒的时间来计划尝试失败的时间。</p>
-<p><img src="https://img1.imgtp.com/2023/08/28/xi4GvxQA.jpg" alt=""></p>
-<p><img src="https://img1.imgtp.com/2023/08/28/liRP1Mlf.jpg" alt=""></p>
-<p><img src="https://img1.imgtp.com/2023/08/28/YV6xYVGa.jpg" alt=""></p>
+<div align=center>
+<img src="https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-28%20215628.jpg" width=60% />
+</div>
+
+<div align=center>
+<img src="https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-28%20215649.jpg" width=60% />
+</div>
+
+<div align=center>
+<img src="https://cdn.jsdelivr.net/gh/Allvey/ImagePlay/Images/%E6%89%B9%E6%B3%A8%202023-08-28%20215640.jpg" width=60% />
+</div>
+
+<!-- ![](https://img1.imgtp.com/2023/08/28/xi4GvxQA.jpg)
+
+![](https://img1.imgtp.com/2023/08/28/liRP1Mlf.jpg)
+
+![](https://img1.imgtp.com/2023/08/28/YV6xYVGa.jpg) -->
 <h1 id="4-亮点及思考"><a href="#4-亮点及思考" class="headerlink" title="4 亮点及思考"></a>4 亮点及思考</h1><ul>
 <li>简要概括就是：1. 构建概率路网；2. 在路网上检测冲突；3. 直接解决冲突或者扩展路网；方法上似乎没有太大的创新，至少在我个人看来这个方法甚至有点 naive；</li>
 <li>但基于概率路网的方法都有一个特点，那就是概率完备，（这一点作者在前面也提到：尽管概率完备，但想要接近完备，所需的时间代价是很高的），本文方法似乎也没能逃出这个魔咒，尽管作者声称其是完备的；</li>
